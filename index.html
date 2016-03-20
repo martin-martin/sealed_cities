@@ -147,8 +147,7 @@ uk.forEach(function(p) {
   function mapMouseOver(d) {
     // highlights the country on mouseover
     var country_id = d.properties.brk_a3;
-    // debugger;
-    console.log(country_id, "is", d.properties.name)
+
     /* in this map, the U.K. is represented as the different countries
     it consists of, however my dataset has data for "United Kingdom".
     therefore I assigned a class "UK" to the countries and here I
@@ -168,8 +167,6 @@ uk.forEach(function(p) {
           }
         })
         .style("stroke", "white");
-
-    // return d.properties.name;
   };
 
 
@@ -202,7 +199,6 @@ uk.forEach(function(p) {
   ////
 
   function showDetails(d) {
-    console.log("you just clicked!", d.properties.brk_a3);
 
     // checking for fit, and calling openModal()
     data0.forEach(function(c) {
@@ -222,8 +218,6 @@ uk.forEach(function(p) {
     function openModal(c) {
       /* function that opens the modal that prints the image-data-representation
       for the country clicked on */
-
-      console.log(c.country, "made it!", d.properties.name);
 
       c.num_houses = d3.range(0, c.total_sealed_in_percent, 1);
       c.num_trees = d3.range(0, 100 - c.total_sealed_in_percent, 1);
