@@ -15,6 +15,10 @@
         </style>
     </head>
     <body>
+    <h1>Soil Sealing in European Cities</h1>
+    <p>
+      Click on a country to see the average amount of <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing">soil sealing</a> across its cities.
+    </p>
         <script type="text/javascript">
 ////
 //// PART 0 - LOADING AND CLEANING THE DATA
@@ -67,6 +71,14 @@ d3.json("map/region_un_Europe_subunits.json", function(error, geo_data) {
 
 function createGraphic(geo_data, data) {
 
+// populating the countries-array
+data0.forEach(function(d) {
+      allCountriesWithData.push(d.country);
+});
+uk.forEach(function(p) {
+  allCountriesWithData.push(p);
+})
+
 ////
 //// PART 1 - BUILDING THE MAP
 ////
@@ -106,13 +118,28 @@ function createGraphic(geo_data, data) {
             return "entity";
           };
         })
-        .style('fill', 'gray')
+        .style('fill', function(d) {
+          if (noDataCountry(d) == true) {
+            return "lightgray";
+          } else {
+            return "gray";
+          }
+        })
         .style("stroke", "white")
         .on("mouseover", mapMouseOver)
         .on("mouseout", mapMouseOut)
         .on("click", showDetails);
 
-
+  function noDataCountry(d) {
+            if (allCountriesWithData.indexOf(d.properties.name) == -1 &&
+            d.properties.name != "Walloon" &&
+            d.properties.name != "Netherlands" &&
+            d.properties.name != "Czech Rep.") {
+            return true;
+          } else {
+            return false;
+          }
+  }
 ////
 //// PART 2 - ADDING INTERACTIVITY
 ////
@@ -133,9 +160,18 @@ function createGraphic(geo_data, data) {
       var selected = country;
     }
     selected
-        .style("fill", "red")
+        .style('fill', function(d) {
+          if (noDataCountry(d) == true) {
+            return "lightgray";
+          } else {
+            return "red";
+          }
+        })
         .style("stroke", "white");
+
+    // return d.properties.name;
   };
+
 
   function mapMouseOut(d) {
     /* returns the country to it's original state
@@ -148,15 +184,16 @@ function createGraphic(geo_data, data) {
       var selected = country;
     }
     selected
-        .style("fill", "gray")
+        .style('fill', function(d) {
+          if (noDataCountry(d) == true) {
+            return "lightgray";
+          } else {
+            return "gray";
+          }
+        })
         .style("stroke", "white");
   };
 
-
-  // populating the countries-array
-  data0.forEach(function(d) {
-        allCountriesWithData.push(d.country);
-  });
 
   ////
   ////
@@ -203,9 +240,9 @@ function createGraphic(geo_data, data) {
       // refreshing the modal box from the previous call
       country_vis.selectAll('img').remove('img');
       // adding the country name and amount of cities
-      var info_text = "Soil sealing across ".concat(c.sum_of_cities)
-                                            .concat(" cities in ")
-                                            .concat(c.country);
+      var info_text = "Average soil sealing across ".concat(c.sum_of_cities)
+                                                    .concat(" cities in ")
+                                                    .concat(c.country);
       country_info
           .text(info_text);
 
@@ -215,7 +252,7 @@ function createGraphic(geo_data, data) {
               .enter()
               .append('img')
                   .attr('class', 'house')
-                  .attr('src', 'img/little_house2.png')
+                  .attr('src', 'img/little_house.png')
                   .attr('alt', 'small house representing sealed soil')
                   .style('width', '40px')
                   .style('height', '40px');
@@ -249,6 +286,7 @@ function createGraphic(geo_data, data) {
             <div class="mosaic"></div>
           </div>
 </div>
+<footer>Data from <a href="http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing">here</a></footer>
 <script type="text/javascript" src="javascript/modal.js"></script>
     </body>
 </html>

@@ -1,3 +1,8 @@
+/* General Page Styles first */
+body {
+    text-align: left;
+}
+
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
