@@ -20,6 +20,11 @@
 //// PART 0 - LOADING AND CLEANING THE DATA
 ////
 
+// defining the vars for later comparison
+var allCountriesWithData = [];
+var uk = ["N. Ireland", "England", "Scotland", "Wales"];
+
+// definint the vars to refer to the loaded data
 var geo_data, data0;
 
 /* importing the geoJSON file for drawing the map
@@ -148,6 +153,11 @@ function createGraphic(geo_data, data) {
   };
 
 
+  // populating the countries-array
+  data0.forEach(function(d) {
+        allCountriesWithData.push(d.country);
+  });
+
   ////
   ////
   //// SECOND PART OF THE ANIMATION, DATA-DRIVEN
@@ -155,69 +165,78 @@ function createGraphic(geo_data, data) {
   ////
 
   function showDetails(d) {
-    console.log("you just clicked!");
-    console.log(d.properties.brk_a3);
+    console.log("you just clicked!", d.properties.brk_a3);
+
+    // checking for fit, and calling openModal()
+    data0.forEach(function(c) {
+
+      if (c.country == d.properties.name ||
+        // accounting for some alternative spelling and organization between the files
+        (c.country == "Belgium" && d.properties.name == "Walloon") ||
+        (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
+        (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
+        (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+        return openModal(c);
+      }
+    // closing data0.forEach()
+    });
 
 
-      data0.forEach(function(c) {
+    function openModal(c) {
+      /* function that opens the modal that prints the image-data-representation
+      for the country clicked on */
 
-      var allCountriesWithData = [];
-      var uk = ["N. Ireland", "England", "Scotland", "Wales"];
+      console.log(c.country, "made it!", d.properties.name);
 
-        // doesn't work to create the array
-        console.log("thaCon", c.country);
-        allCountriesWithData.push(c.country);
+      c.num_houses = d3.range(0, c.total_sealed_in_percent, 1);
+      c.num_trees = d3.range(0, 100 - c.total_sealed_in_percent, 1);
 
-        if (c.country == d.properties.name ||
-          // accounting for some alternative spelling and organization between the files
-          (c.country == "Belgium" && d.properties.name == "Walloon") ||
-          (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
-          (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
-          (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
-          return openModal(c);
-        }
+      var country_vis =  d3.select('.modal-content')
+                            .select('.mosaic')
+                            .style('width', '400px')
+                            .style('height', '400px');
 
-        /* defining the function like this (without var)
-        makes it accessible also above already */
-        function openModal(c) {
+      var country_info =  d3.select('.modal-content').select('p');
 
-          console.log(c.country, "made it!", d.properties.name);
+      // making the modal box visible
+      d3.select('#myModal').style('display', 'block');
+      // refreshing the modal box from the previous call
+      country_vis.selectAll('img').remove('img');
+      // adding the country name and amount of cities
+      var info_text = "Soil sealing across ".concat(c.sum_of_cities)
+                                            .concat(" cities in ")
+                                            .concat(c.country);
+      country_info
+          .text(info_text);
 
-          c.num_blocks = d3.range(0,c.total_sealed_in_percent,1);
-          c.num_squares = d3.range(0,100 - c.total_sealed_in_percent,1);
-
-          var country_vis =  d3.select('.modal-content')
-                                .select('.mosaic')
-                                .style('width', '400px')
-                                .style('height', '400px');
-
-          var country_info =  d3.select('.modal-content').select('p');
-
-          // making the modal box visible
-          d3.select('#myModal').style('display', 'block');
-          // refreshing the modal box from the previous call
-          country_vis.select('img').remove('img');
-          // adding the country name
-          country_info
-              .text(c.country)
-          // adding the images
-          country_vis
+      // insert imgs with class 'house'
+      var houses = country_vis.selectAll('.house')
+              .data(c.num_houses)
+              .enter()
               .append('img')
-              .attr('class', 'block')
-              .attr('src', 'img/little_house2.png')
-              .attr('alt', 'example block')
-              .style('width', '40px')
-              .style('height', '40px');
+                  .attr('class', 'house')
+                  .attr('src', 'img/little_house2.png')
+                  .attr('alt', 'small house representing sealed soil')
+                  .style('width', '40px')
+                  .style('height', '40px');
 
-        // closing openModal()
-        };
-      // closing data0.forEach()
-      });
+      // insert imgs with class 'tree'
+      var squares = country_vis.selectAll('.tree')
+              .data(c.num_trees)
+              .enter()
+              .append('img')
+                  .attr('class', 'tree')
+                  .attr('src', 'img/tree.svg')
+                  .attr('alt', 'green tree representing unsealed soil')
+                  .style('width', '40px')
+                  .style('height', '40px');
+
+    // closing openModal()
+    };
   // closing showDetails()
   };
 // THE FINAL PARENTHESES (closing showGraphic())
 };
-
         </script>
 
         <!-- The Modal -->
