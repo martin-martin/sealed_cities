@@ -17,13 +17,55 @@
     <body>
         <script type="text/javascript">
 ////
+//// PART 0 - LOADING AND CLEANING THE DATA
+////
+
+var geo_data, data0;
+
+/* importing the geoJSON file for drawing the map
+Resource: http://grokbase.com/t/gg/d3-js/1372gq18j9/geojson-maps - Thanks :) */
+d3.json("map/region_un_Europe_subunits.json", function(error, geo_data) {
+  "use strict";
+
+  // saving the data
+  geo_data = geo_data;
+
+  // importing the json file
+  d3.json('soil_sealing_cities.json', function(error, data) {
+    // perform some data wrangling for each row
+    data.forEach(function(d) {
+      d.country = d.country;
+      // transform strings to integers
+      d.cat_below_25_percent = +d.cat_below_25_percent;
+      d.cat_25_to_49_percent = +d.cat_25_to_49_percent;
+      d.cat_50_to_74_percent = +d.cat_50_to_74_percent;
+      d.cat_75_and_above_percent = +d.cat_75_and_above_percent;
+      d.sum_of_cities = +d.sum_of_cities;
+      d.percentage_cities_50_and_above_percent =
+          +d.percentage_cities_50_and_above_percent;
+      d.total_sealed_in_percent = +d.total_sealed_in_percent;
+      });
+
+      // saving the data (I use 'data0' to avoid confusion with 'data')
+      data0 = data;
+
+      // USING BOTH LOADED DATABASES
+      createGraphic(geo_data, data0);
+
+  // closing the inner data loading function
+  });
+// closing the outer data loading function
+});
+
+
+
+
+function createGraphic(geo_data, data) {
+
+////
 //// PART 1 - BUILDING THE MAP
 ////
 
-// importing the geoJSON file for drawing the map
-// Resource: http://grokbase.com/t/gg/d3-js/1372gq18j9/geojson-maps - Thanks :)
-d3.json("map/region_un_Europe_subunits.json", function(geo_data) {
-  "use strict";
   var margin = 75,
       width = 1920 - margin,
       height = 1080 - margin;
@@ -47,30 +89,38 @@ d3.json("map/region_un_Europe_subunits.json", function(geo_data) {
         .append('path')
         .attr('d', path)
         .attr('id', function(d) {
+          // debugger;
           return d.properties.brk_a3;
         })
         .attr('class', function(d) {
           var country_id = d.properties.brk_a3;
+          // unifying the United Kingdom
           if (country_id == "SCT" || country_id == "ENG" || country_id == "WLS" || country_id == "NIR") {
             return "UK";
           } else {
             return "entity";
           };
         })
+        .style('fill', 'gray')
+        .style("stroke", "white")
         .on("mouseover", mapMouseOver)
         .on("mouseout", mapMouseOut)
-        .on("click", showDetails)
-        .style('fill', 'gray')
-        .style("stroke", "white");
+        .on("click", showDetails);
+
+
+////
+//// PART 2 - ADDING INTERACTIVITY
+////
 
   function mapMouseOver(d) {
     // highlights the country on mouseover
     var country_id = d.properties.brk_a3;
+    // debugger;
     console.log(country_id, "is", d.properties.name)
-    // in this map, the U.K. is represented in the different countries
-    // however my dataset has data for "United Kingdom".
-    // therefore I assigned a class "UK" to the countries and here I
-    // am chaining them to color at the same time.
+    /* in this map, the U.K. is represented as the different countries
+    it consists of, however my dataset has data for "United Kingdom".
+    therefore I assigned a class "UK" to the countries and here I
+    am chaining them to color at the same time. */
     var country = d3.selectAll($("#" + country_id));
     if (country.attr('class') == 'UK') {
       var selected = d3.selectAll('.UK');
@@ -83,8 +133,8 @@ d3.json("map/region_un_Europe_subunits.json", function(geo_data) {
   };
 
   function mapMouseOut(d) {
-    // returns the country to it's original state
-    // when the cursor leaves the area
+    /* returns the country to it's original state
+    when the cursor leaves the area */
     var country_id = d.properties.brk_a3;
     var country = d3.selectAll($("#" + country_id));
     if (country.attr('class') == 'UK') {
@@ -104,48 +154,37 @@ d3.json("map/region_un_Europe_subunits.json", function(geo_data) {
   ////
   ////
 
-  // nesting the data import into the showDetails function (which is where I'll use it)
   function showDetails(d) {
     console.log("you just clicked!");
     console.log(d.properties.brk_a3);
 
 
-// debugger;
+      data0.forEach(function(c) {
 
+      var allCountriesWithData = [];
+      var uk = ["N. Ireland", "England", "Scotland", "Wales"];
 
-  // importing the json file
-  d3.json('soil_sealing_cities.json', function(error, data) {
-    ////
-    //// PART 2 - DATA CLEANING
-    ////
-    // perform the data wrangling for each row
-    data.forEach(function(d) {
-      d.country = d.country;
-      // transform strings to integers
-      d.cat_below_25_percent = +d.cat_below_25_percent;
-      d.cat_25_to_49_percent = +d.cat_25_to_49_percent;
-      d.cat_50_to_74_percent = +d.cat_50_to_74_percent;
-      d.cat_75_and_above_percent = +d.cat_75_and_above_percent;
-      d.sum_of_cities = +d.sum_of_cities;
-      d.percentage_cities_50_and_above_percent = +d.percentage_cities_50_and_above_percent;
-      d.total_sealed_in_percent = +d.total_sealed_in_percent;
-      });
+        // doesn't work to create the array
+        console.log("thaCon", c.country);
+        allCountriesWithData.push(c.country);
 
-// debugger;
+        if (c.country == d.properties.name ||
+          // accounting for some alternative spelling and organization between the files
+          (c.country == "Belgium" && d.properties.name == "Walloon") ||
+          (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
+          (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
+          (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+          return openModal(c);
+        }
 
-
-
-// debugger;
-
-      data.forEach(function(c) {
-        // console.log(d);
-        if (c.country == d.properties.name) {
+        /* defining the function like this (without var)
+        makes it accessible also above already */
+        function openModal(c) {
 
           console.log(c.country, "made it!", d.properties.name);
 
           c.num_blocks = d3.range(0,c.total_sealed_in_percent,1);
           c.num_squares = d3.range(0,100 - c.total_sealed_in_percent,1);
-// debugger;
 
           var country_vis =  d3.select('.modal-content')
                                 .select('.mosaic')
@@ -169,92 +208,15 @@ d3.json("map/region_un_Europe_subunits.json", function(geo_data) {
               .attr('alt', 'example block')
               .style('width', '40px')
               .style('height', '40px');
-            // .data( function(c) {
-            //    return c.num_blocks
-            //  })
-            // .enter()
-            // .text(d.properties.brk_a3)
-            // .append('img')
-            //     .attr('class', 'block')
-            //     .attr('src', 'img/little_house2.png')
-            //     .attr('alt', 'example block')
-            //     .style('width', '40px')
-            //     .style('height', '40px');
-        }
+
+        // closing openModal()
+        };
+      // closing data0.forEach()
       });
-
-
-// debugger;
-
-
-
-
-
-    ////
-    //// PART 3 - DRAWING HOUSES AND TREES
-    ////
-    d3.select('body').append('span').attr('class', 'example');
-
-    // modify the initial data
-    data.forEach(function(d){
-            // calling the function to generate the range for each row entry
-            d.num_blocks = d3.range(0,d.total_sealed_in_percent,1);
-            d.num_squares = d3.range(0,100 - d.total_sealed_in_percent,1);
-    })
-
-    // insert a div for each row
-    var rows = d3.select('.example').selectAll('div')
-        .data(data, function(d, i) {
-            // binding a key to each row. It is not really necessary on this example
-            // but I will leave it here to make the use of key functions clear
-            return "row_" + i;
-        })
-        .enter()
-        .append('div');
-
-    // insert imgs with class block in each row
-    var blocks = rows.selectAll('.block')
-            .data(function (d){
-                return d.num_blocks
-            })
-            .enter()
-            .append('img')
-                .attr('class', 'block')
-                .attr('src', 'img/little_house2.png')
-                .attr('alt', 'example block')
-                .style('width', '40px')
-                .style('height', '40px')
-
-    // insert imgs with class squares in each row
-    var squares = rows.selectAll('.square')
-            .data(function (d){
-                return d.num_squares
-            })
-            .enter()
-            .append('img')
-                .attr('class', 'square')
-                .attr('src', 'img/tree.svg')
-                .attr('alt', 'example square')
-                .style('width', '40px')
-                .style('height', '40px');
-
-  // HERE THE PART OF THE JSON DATA ENDS
-  });
-
-
-
+  // closing showDetails()
   };
-  // when i click I get d as the element holding the country's data.
-  // however I will need the corresponding data from the OTHER data file
-  // - so I need to link it into here
-
-
-//// AND HERE IT ALL ENDS
-});
-
-
-
-
+// THE FINAL PARENTHESES (closing showGraphic())
+};
 
         </script>
 
