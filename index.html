@@ -6,7 +6,7 @@
         <script type="text/javascript" src="d3/d3.v3.js"></script>
         <script type="text/javascript" src="javascript/jQuery.js"></script>
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <!-- <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'> -->
+        <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
     </head>
     <body>
     <header>
@@ -163,7 +163,29 @@ uk.forEach(function(p) {
           if (noDataCountry(d) == true) {
             return "lightgray";
           } else {
-            return "orange";
+            var color
+            data0.forEach(function(c) {
+              if (c.country == d.properties.name ||
+                // accounting for some alternative spelling and organization between the files
+                (c.country == "Belgium" && d.properties.name == "Walloon") ||
+                (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
+                (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
+                (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+                  // coloring the countries according to a traffic light scheme
+                  if (c.total_sealed_in_percent < 40) {
+                    color = "lightgreen";
+                    return color;
+                  }
+                  else if (c.total_sealed_in_percent < 50) {
+                    color = "orange";
+                    return color;
+                  } else {
+                    color = "red";
+                    return color;
+                  }
+              };
+            // closing data0.forEach()
+            }); return color;
           }
         })
         .style("stroke", "white");
@@ -313,8 +335,19 @@ uk.forEach(function(p) {
           <!-- Modal content -->
           <div class="modal-content">
             <span class="close">x</span>
-            <p>Here comes the country's name</p>
-            <div class="mosaic"></div>
+            <p class="modal-heading">Here comes the country's name</p>
+            <div class="visualization">
+              <div class="mosaic"></div>
+              <div class="legend">
+                <h4>LEGEND</h4>
+                <p>each tile<br>represents 1%</p>
+                <hr>
+                <img class="legend-image" src="img/little_house.png">
+                <p class="legend-desc">sealed soil</p>
+                <img class="legend-image" src="img/tree.svg">
+                <p class="legend-desc">open soil</p>
+              </div>
+            </div>
           </div>
 </div>
 <footer>

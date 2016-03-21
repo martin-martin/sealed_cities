@@ -34,10 +34,31 @@ a {
   height: 28px;
   padding: 2px;
   font: 12px sans-serif;
-  background: lightgray;
+  background: white;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
+}
+
+.visualization {
+    display: flex;
+    justify-content: space-around;
+    align-items: bottom;
+}
+
+.legend {
+    text-align: center;
+    font-size: 10px;
+}
+
+.legend-image {
+    width: 20px;
+    height: 20px;
+}
+
+.legend-desc {
+    padding: 0;
+    margin: 0;
 }
 
 footer {
@@ -62,13 +83,16 @@ footer {
 
 /* Modal Content/Box */
 .modal-content {
-    text-align: center;
     background-color: #fefefe;
     margin: 10% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 30%;
-    height: 70%;
+    width: 500px;
+    height: 515px;
+}
+
+.modal-heading {
+    padding-left: 10px;
 }
 
 .mosaic {
