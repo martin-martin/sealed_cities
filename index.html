@@ -6,19 +6,15 @@
         <script type="text/javascript" src="d3/d3.v3.js"></script>
         <script type="text/javascript" src="javascript/jQuery.js"></script>
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <style type="text/css">
-            .example {
-                display: flex;
-                flex-wrap: wrap;
-                width: 400px;
-            }
-        </style>
+        <!-- <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'> -->
     </head>
     <body>
-    <h1>Soil Sealing in European Cities</h1>
-    <p>
-      Click on a country to see the average amount of <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing">soil sealing</a> across its cities.
-    </p>
+    <header>
+      <h1>Soil Sealing in European Cities</h1>
+      <p class="top-description">
+        Click on a country to see the average amount of <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing">soil sealing</a> across its cities.
+      </p>
+    </header>
         <script type="text/javascript">
 ////
 //// PART 0 - LOADING AND CLEANING THE DATA
@@ -67,6 +63,10 @@ d3.json("map/region_un_Europe_subunits.json", function(error, geo_data) {
 });
 
 
+// adding the tooltip div
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 
 function createGraphic(geo_data, data) {
@@ -167,8 +167,39 @@ uk.forEach(function(p) {
           }
         })
         .style("stroke", "white");
+
+    // showing the tooltip div
+    var tip = d3.select(".tooltip")
+    if (noDataCountry(d) == false) {
+      tip.transition()
+          .duration(200)
+          .style("opacity", .9)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+    };
+
+    // checking for fit, and calling populateTooltip()
+    data0.forEach(function(c) {
+
+      if (c.country == d.properties.name ||
+        // accounting for some alternative spelling and organization between the files
+        (c.country == "Belgium" && d.properties.name == "Walloon") ||
+        (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
+        (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
+        (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+        return populateTooltip(c);
+      }
+    // closing data0.forEach()
+    });
   };
 
+  function populateTooltip(c) {
+    // adds the % of soil sealing as text to the tooltip div
+    var tip = d3.select(".tooltip");
+    tip.text("".concat(c.total_sealed_in_percent).concat("%").concat("\n").concat("sealed"))
+      .style("color", "black");
+  // closing populateTooltip()
+  };
 
   function mapMouseOut(d) {
     /* returns the country to it's original state
@@ -189,8 +220,14 @@ uk.forEach(function(p) {
           }
         })
         .style("stroke", "white");
-  };
 
+    // removing the tooltip on mouseout
+    var tip = d3.select(".tooltip")
+
+    tip.transition()
+        .duration(500)
+        .style("opacity", 0);
+  };
 
   ////
   ////
@@ -280,7 +317,9 @@ uk.forEach(function(p) {
             <div class="mosaic"></div>
           </div>
 </div>
-<footer>Data from <a href="http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing">here</a></footer>
+<footer>
+  <p>Data from <a href="http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing">here</a></p>
+</footer>
 <script type="text/javascript" src="javascript/modal.js"></script>
     </body>
 </html>

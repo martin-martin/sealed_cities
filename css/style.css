@@ -1,6 +1,49 @@
 /* General Page Styles first */
 body {
+    font-family: 'Oswald', sans-serif;
     text-align: left;
+    max-width: 1100px;
+    margin: auto;
+}
+
+header {
+/*    position: fixed;
+    top: 5px;*/
+    display: flex;
+    justify-content: space-between;
+}
+
+.top-description {
+    padding-top: 20px;
+}
+
+.example {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+}
+
+a {
+    color: orange;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightgray;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+footer {
+    position: fixed;
+    bottom: 5px;
+    color: gray;
 }
 
 /* The Modal (background) */
@@ -19,15 +62,13 @@ body {
 
 /* Modal Content/Box */
 .modal-content {
-/*    display: flex;
-    justify-content: space-around;
-    align-items: column;*/
+    text-align: center;
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
+    margin: 10% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 40%; /* Could be more or less, depending on screen size */
-    height: 80%;
+    width: 30%;
+    height: 70%;
 }
 
 .mosaic {
