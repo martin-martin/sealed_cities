@@ -7,8 +7,6 @@ body {
 }
 
 header {
-/*    position: fixed;
-    top: 5px;*/
     display: flex;
     justify-content: space-between;
 }
@@ -29,12 +27,6 @@ header {
     border: 1px solid orange;
     border-radius: 15px;
     padding: 10px;
-/*    margin-top: 200px;
-    margin-left: 100px;
-    margin-right: 100px;
-    overflow: visible;
-    position: relative;
-    z-index: 1;*/
     position: absolute;
     top: 180px;
     left: 360px;
@@ -48,13 +40,13 @@ header {
 }
 
 button {
+    font-family: 'Oswald', sans-serif;
     background-color: white;
     color: black;
     font-size: 12px;
     border: 2px solid orange;
     border-radius: 12px;
     text-align: center;
-    text-decoration: none;
 }
 
 button:hover {
@@ -71,7 +63,7 @@ a:focus {
 .impact {
     opacity: 0;
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     color: lightgray;
 }
 

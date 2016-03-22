@@ -5,9 +5,9 @@
         <title>Sealed Cities</title>
         <link rel="icon" type="image/png" href="img/favicon.ico">
         <script type="text/javascript" src="d3/d3.v3.js"></script>
-        <script type="text/javascript" src="javascript/jQuery.js"></script>
+        <script type="text/javascript" src="js/jQuery.js"></script>
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <!-- <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'> -->
+        <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
     </head>
     <body>
       <header>
@@ -18,13 +18,15 @@
       </header>
       <div class="button-container">
         <div class="impact">
-          human touch has a lasting impact on nature <----> mouseover to <b>seal soils</b>
+          <b>human touch</b> has a lasting impact on nature <----> mouseover to <b>seal soils</b>
         </div>
       </div>
       <div class="info-container">
         <div></div>
         <div class="infobox">
-          <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing"><strong>SOIL SEALING</strong></a> is the loss of soil resources<br>due to the covering of land for housing,<br>roads or other construction work.
+          <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing">
+          <strong>SOIL SEALING</strong></a> is the loss of soil resources
+          <br>due to the covering of land for housing,<br>roads or other construction work.
         </div>
         <div></div>
       </div>
@@ -42,14 +44,14 @@ var geo_data, data0;
 
 /* importing the geoJSON file for drawing the map
 Resource: http://grokbase.com/t/gg/d3-js/1372gq18j9/geojson-maps - Thanks :) */
-d3.json("map/region_un_Europe_subunits.json", function(error, geo_data) {
+d3.json("data/region_un_Europe_subunits.json", function(error, geo_data) {
   "use strict";
 
   // saving the data
   geo_data = geo_data;
 
   // importing the json file
-  d3.json('soil_sealing_cities.json', function(error, data) {
+  d3.json('data/soil_sealing_cities.json', function(error, data) {
     // perform some data wrangling for each row
     data.forEach(function(d) {
       d.country = d.country;
@@ -76,136 +78,143 @@ d3.json("map/region_un_Europe_subunits.json", function(error, geo_data) {
 });
 
 
-// adding the tooltip div
-var div = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
 
-
+// HERE COMES THE FUNCTION HOLDING ALL THE MAIN LOGIC
 function createGraphic(geo_data, data) {
+  // populating the countries-array
+  data0.forEach(function(d) {
+    allCountriesWithData.push(d.country);
+  });
+  uk.forEach(function(p) {
+    allCountriesWithData.push(p);
+  });
 
-// populating the countries-array
-data0.forEach(function(d) {
-      allCountriesWithData.push(d.country);
-});
-uk.forEach(function(p) {
-  allCountriesWithData.push(p);
-})
+  ////
+  //// PART 1 - BUILDING THE MAP
+  ////
 
-////
-//// PART 1 - BUILDING THE MAP
-////
-
+  // setting the margin etc. (taken from the course)
   var margin = 75,
-      width = 1920 - margin,
-      height = 1080 - margin;
+    width = 1920 - margin,
+    height = 1080 - margin;
 
   var svg = d3.select('body')
-      .append('svg')
-      .attr('width', width + margin)
-      .attr('height', height + margin)
-      .append('g')
-      .attr('class', 'map');
+    .append('svg')
+    .attr('width', width + margin)
+    .attr('height', height + margin)
+    .append('g')
+    .attr('class', 'map');
 
   var projection = d3.geo.mercator()
-        .scale(700)
-        .translate([width / 2 - 600, height + 250]);
+      // arranging the map so that it fits on the page
+      .scale(700)
+      .translate([width / 2 - 600, height + 250]);
 
   var path = d3.geo.path().projection(projection);
 
   var map = svg.selectAll('path')
-        .data(geo_data.features)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .attr('id', function(d) {
-          // debugger;
-          return d.properties.brk_a3;
-        })
-        .attr('class', function(d) {
-          var country_id = d.properties.brk_a3;
-          // unifying the United Kingdom
-          if (country_id == "SCT" || country_id == "ENG" || country_id == "WLS" || country_id == "NIR") {
-            return "UK";
-          } else {
-            return "entity";
-          };
-        })
-        .style('fill', function(d) {
-          if (noDataCountry(d) == true) {
-            return "lightgray";
-          } else {
-            return "gray";
-          }
-        })
-        .style("stroke", "white")
-        .on("mouseover", mapMouseOver)
-        .on("mouseout", mapMouseOut)
-        .on("click", showDetails);
+      .data(geo_data.features)
+      .enter()
+      .append('path')
+      .attr('d', path)
+      // adding an id to each country, defined by country code
+      .attr('id', function(d) {
+        return d.properties.brk_a3;
+      })
+      .attr('class', function(d) {
+        var country_id = d.properties.brk_a3;
+        // unifying the United Kingdom
+        if (country_id == "SCT" ||
+              country_id == "ENG" ||
+              country_id == "WLS" ||
+              country_id == "NIR") {
+          return "UK";
+        } else {
+          return "entity";
+        };
+      })
+      // filling the countries darker that I have values for
+      .style('fill', function(d) {
+        if (noDataCountry(d) == true) {
+          return "lightgray";
+        } else {
+          return "gray";
+        }
+      })
+      .style("stroke", "white")
+      // assigning the callbacks to the country paths
+      .on("mouseover", mapMouseOver)
+      .on("mouseout", mapMouseOut)
+      .on("click", showDetails);
 
   function noDataCountry(d) {
-            if (allCountriesWithData.indexOf(d.properties.name) == -1 &&
-            d.properties.name != "Walloon" &&
-            d.properties.name != "Netherlands" &&
-            d.properties.name != "Czech Rep.") {
-            return true;
-          } else {
-            return false;
-          }
+          if (allCountriesWithData.indexOf(d.properties.name) == -1 &&
+          d.properties.name != "Walloon" &&
+          d.properties.name != "Netherlands" &&
+          d.properties.name != "Czech Rep.") {
+          return true;
+        } else {
+          return false;
+        }
   };
 
   // creating a button
   d3.select('.button-container')
-    .data(geo_data.features)
-    .insert("button",":first-child")
-    .text('Unseal Map')
-    .on('click', showColors);
+  .data(geo_data.features)
+  .insert("button",":first-child")
+  .text('Unseal Map')
+  .on('click', showColors);
 
   function showColors(d) {
-    d3.select('.impact')
-      .style('opacity', 1);
+  d3.select('.impact')
+    .style('opacity', 1);
 
 
-    var country_id = d.properties.brk_a3;
-    var country = d3.selectAll('path')
-    country
-        .style('fill', function(d) {
-          if (noDataCountry(d) == true) {
-            return "lightgray";
-          } else {
-            var color
-            data0.forEach(function(c) {
-              if (c.country == d.properties.name ||
-                // accounting for some alternative spelling and organization between the files
-                (c.country == "Belgium" && d.properties.name == "Walloon") ||
-                (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
-                (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
-                (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
-                  // coloring the countries according to a traffic light scheme
-                  if (c.total_sealed_in_percent < 40) {
-                    color = "lightgreen";
-                    return color;
-                  }
-                  else if (c.total_sealed_in_percent < 50) {
-                    color = "orange";
-                    return color;
-                  } else {
-                    color = "red";
-                    return color;
-                  }
-              };
-            // closing data0.forEach()
-            }); return color;
-          }
-        })
-        .style("stroke", "white");
+  var country_id = d.properties.brk_a3;
+  var country = d3.selectAll('path')
+  country
+      .style('fill', function(d) {
+        if (noDataCountry(d) == true) {
+          return "lightgray";
+        } else {
+          var color
+          data0.forEach(function(c) {
+            if (c.country == d.properties.name ||
+              // accounting for some alternative spelling and organization between the files
+              (c.country == "Belgium" && d.properties.name == "Walloon") ||
+              (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
+              (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
+              (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+                // coloring the countries according to a traffic light scheme
+                if (c.total_sealed_in_percent < 40) {
+                  color = "lightgreen";
+                  return color;
+                }
+                else if (c.total_sealed_in_percent < 50) {
+                  color = "orange";
+                  return color;
+                } else {
+                  color = "red";
+                  return color;
+                }
+            };
+          // closing data0.forEach()
+          }); return color;
+        }
+      })
+      .style("stroke", "white");
 
   };
 
 
-////
-//// PART 2 - ADDING INTERACTIVITY
-////
+  ////
+  //// PART 2 - ADDING INTERACTIVITY
+  ////
+
+  // adding the tooltip div to the DOM
+  var div = d3.select("body").append("div")
+              .attr("class", "tooltip")
+              .style("opacity", 0);
 
   function mapMouseOver(d) {
     // highlights the country on mouseover
@@ -226,14 +235,20 @@ uk.forEach(function(p) {
           if (noDataCountry(d) == true) {
             return "lightgray";
           } else {
+            // do the color change only if I have data for the country
             var color
             data0.forEach(function(c) {
               if (c.country == d.properties.name ||
-                // accounting for some alternative spelling and organization between the files
-                (c.country == "Belgium" && d.properties.name == "Walloon") ||
-                (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
-                (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
-                (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+                /* accounting for some alternative spelling
+                and organization between the files */
+                (c.country == "Belgium"
+                  && d.properties.name == "Walloon") ||
+                (c.country == "The Netherlands"
+                  && d.properties.name == "Netherlands") ||
+                (c.country == "Czech Republic"
+                  && d.properties.name == "Czech Rep.") ||
+                (c.country == "United Kingdom"
+                  && uk.indexOf(d.properties.name) != -1)) {
                   // coloring the countries according to a traffic light scheme
                   if (c.total_sealed_in_percent < 40) {
                     color = "lightgreen";
@@ -267,11 +282,16 @@ uk.forEach(function(p) {
     data0.forEach(function(c) {
 
       if (c.country == d.properties.name ||
-        // accounting for some alternative spelling and organization between the files
-        (c.country == "Belgium" && d.properties.name == "Walloon") ||
-        (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
-        (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
-        (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+        /* accounting for some alternative spelling
+        and organization between the files */
+        (c.country == "Belgium"
+          && d.properties.name == "Walloon") ||
+        (c.country == "The Netherlands"
+          && d.properties.name == "Netherlands") ||
+        (c.country == "Czech Republic"
+          && d.properties.name == "Czech Rep.") ||
+        (c.country == "United Kingdom"
+          && uk.indexOf(d.properties.name) != -1)) {
         return populateTooltip(c);
       }
     // closing data0.forEach()
@@ -281,7 +301,8 @@ uk.forEach(function(p) {
   function populateTooltip(c) {
     // adds the % of soil sealing as text to the tooltip div
     var tip = d3.select(".tooltip");
-    tip.text("".concat(c.total_sealed_in_percent).concat("%").concat("\n").concat("sealed"))
+    tip.text("".concat(c.total_sealed_in_percent).concat("%").concat("\n")
+                .concat("sealed"))
       .style("color", "black");
   // closing populateTooltip()
   };
@@ -327,11 +348,16 @@ uk.forEach(function(p) {
     data0.forEach(function(c) {
 
       if (c.country == d.properties.name ||
-        // accounting for some alternative spelling and organization between the files
-        (c.country == "Belgium" && d.properties.name == "Walloon") ||
-        (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
-        (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
-        (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+        /* accounting for some alternative spelling
+        and organization between the files */
+        (c.country == "Belgium"
+          && d.properties.name == "Walloon") ||
+        (c.country == "The Netherlands"
+          && d.properties.name == "Netherlands") ||
+        (c.country == "Czech Republic"
+          && d.properties.name == "Czech Rep.") ||
+        (c.country == "United Kingdom"
+          && uk.indexOf(d.properties.name) != -1)) {
         return openModal(c);
       }
     // closing data0.forEach()
@@ -339,8 +365,8 @@ uk.forEach(function(p) {
 
 
     function openModal(c) {
-      /* function that opens the modal that prints the image-data-representation
-      for the country clicked on */
+      /* function that opens the modal that prints the
+      image-data-representation for the country clicked on */
 
       c.num_houses = d3.range(0, c.total_sealed_in_percent, 1);
       c.num_trees = d3.range(0, 100 - c.total_sealed_in_percent, 1);
@@ -394,7 +420,6 @@ uk.forEach(function(p) {
         </script>
 
         <!-- The Modal -->
-        <!-- <h1>here</h1> -->
         <div id="myModal" class="modal">
           <!-- Modal content -->
           <div class="modal-content">
@@ -403,6 +428,7 @@ uk.forEach(function(p) {
             <div class="visualization">
               <div class="mosaic"></div>
               <div class="legend">
+                <!-- this part harcodes the legend for the mosaic viz -->
                 <h4>LEGEND</h4>
                 <p>each tile<br>represents 1%</p>
                 <hr>
@@ -413,10 +439,12 @@ uk.forEach(function(p) {
               </div>
             </div>
           </div>
-</div>
-<footer>
-  <p>Data from <a href="http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing">here</a></p>
-</footer>
-<script type="text/javascript" src="javascript/modal.js"></script>
+        </div>
+      <footer>
+        <p>Data from
+        <a href="http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing">
+          here</a></p>
+      </footer>
+      <script type="text/javascript" src="javascript/modal.js"></script>
     </body>
 </html>
