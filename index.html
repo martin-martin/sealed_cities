@@ -3,19 +3,32 @@
     <head>
         <meta charset="utf-8">
         <title>Sealed Cities</title>
+        <link rel="icon" type="image/png" href="img/favicon.ico">
         <script type="text/javascript" src="d3/d3.v3.js"></script>
         <script type="text/javascript" src="javascript/jQuery.js"></script>
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+        <!-- <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'> -->
     </head>
     <body>
-    <header>
-      <h1>Soil Sealing in European Cities</h1>
-      <p class="top-description">
-        Click on a country to see the average amount of <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing">soil sealing</a> across its cities.
-      </p>
-    </header>
-        <script type="text/javascript">
+      <header>
+        <h1>Soil Sealing in European Cities</h1>
+        <p class="top-description">
+          Click on a country to see the average amount of soil sealing across its cities.
+        </p>
+      </header>
+      <div class="button-container">
+        <div class="impact">
+          human touch has a lasting impact on nature <----> mouseover to <b>seal soils</b>
+        </div>
+      </div>
+      <div class="info-container">
+        <div></div>
+        <div class="infobox">
+          <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing"><strong>SOIL SEALING</strong></a> is the loss of soil resources<br>due to the covering of land for housing,<br>roads or other construction work.
+        </div>
+        <div></div>
+      </div>
+      <script type="text/javascript">
 ////
 //// PART 0 - LOADING AND CLEANING THE DATA
 ////
@@ -24,7 +37,7 @@
 var allCountriesWithData = [];
 var uk = ["N. Ireland", "England", "Scotland", "Wales"];
 
-// definint the vars to refer to the loaded data
+// defining the vars to refer to the loaded data
 var geo_data, data0;
 
 /* importing the geoJSON file for drawing the map
@@ -139,7 +152,57 @@ uk.forEach(function(p) {
           } else {
             return false;
           }
-  }
+  };
+
+  // creating a button
+  d3.select('.button-container')
+    .data(geo_data.features)
+    .insert("button",":first-child")
+    .text('Unseal Map')
+    .on('click', showColors);
+
+  function showColors(d) {
+    d3.select('.impact')
+      .style('opacity', 1);
+
+
+    var country_id = d.properties.brk_a3;
+    var country = d3.selectAll('path')
+    country
+        .style('fill', function(d) {
+          if (noDataCountry(d) == true) {
+            return "lightgray";
+          } else {
+            var color
+            data0.forEach(function(c) {
+              if (c.country == d.properties.name ||
+                // accounting for some alternative spelling and organization between the files
+                (c.country == "Belgium" && d.properties.name == "Walloon") ||
+                (c.country == "The Netherlands" && d.properties.name == "Netherlands") ||
+                (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
+                (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
+                  // coloring the countries according to a traffic light scheme
+                  if (c.total_sealed_in_percent < 40) {
+                    color = "lightgreen";
+                    return color;
+                  }
+                  else if (c.total_sealed_in_percent < 50) {
+                    color = "orange";
+                    return color;
+                  } else {
+                    color = "red";
+                    return color;
+                  }
+              };
+            // closing data0.forEach()
+            }); return color;
+          }
+        })
+        .style("stroke", "white");
+
+  };
+
+
 ////
 //// PART 2 - ADDING INTERACTIVITY
 ////
@@ -250,6 +313,7 @@ uk.forEach(function(p) {
         .duration(500)
         .style("opacity", 0);
   };
+
 
   ////
   ////
