@@ -1,58 +1,141 @@
-# Sealed Cities - Soil Sealing in European CitiesSoils are extremely valuable, but often not taken care of. Especially in cities, sealing the ground with impervious materials for housing, streets, and car parks, is very common. Soil sealing contributes to global warming, promotes water scarcity and flooding at the same time, and puts biodiversity at peril.## Summary
-This map allows you to explore the average degrees of soil sealing in European cities. It is visible that, in general, the Nothern countries show a lower degree of soil sealing than Central European countries. The average degree of soil sealing across the cities in many European countries is higher than 50%.
-## Design### 0. Choice of Topic**Urban sprawl** is a major issue even in the rural areas that I grew up in. Over the years new houses, and the associated shopping districts and parking lots, have been popping up everywhere - but old ones do not get broken down. I didn't have neighbours as a kid, but since then the suburbs have grown all around.
-Initially, I was looking for data that would allow me to visualize the large extend of area that has been turned into _living area_ over the past years, however the **CORINE land use data** was difficult to access. I decided that data wrangling was not the main point of this project for me, so I looked for already _digested_ data.
-I always wanted to create a map, since I find these visualizations often very attractive and insightful: Projecting information onto projections of the world.
-Additionally, maps are one of the functionalities that d3 is especially powerful in, and I wanted to go for the meat of it ; )
----
-### 1. Choice of Dataset
-I sometimes find graphs and charts not completely straightforward to understand, yet I am a all drawn-in by good data visualizations. Inspired also by [this](http://ripetungi.com/wp-content/uploads/Shark-Attack-Stop-Finning-Infographic.png), I wanted to use images to display the ratios of soil sealing.
-After searching the site of the [**European Environment Agency**](http://www.eea.europa.eu/data-and-maps/) for a fitting dataset, I found a set dedicated on **soil sealing** in European cities that had pre-processed data from the [CORINE land survey](http://www.eea.europa.eu/data-and-maps/data/corine-land-cover-3#tab-gis-data) easily accessible.
-Searching those sites I had also discovered that the soil sealing relative to the countries' surface would be a number of usually below 4%, which would not have been interesting to visualize in the ways that I wanted to explore.
-So I chose to use the data that went into generating [this graph](http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing), but give it a different workover.
----
-### 2. Data Cleaning and Wrangling
-I extracted the data from the `.xlsx` file provided on the website and exported it into `.csv`. After working with the data for a while, I realized that I didn't want to use the `percentage of cities >= 50%`. Some countries had many cities, others very few. It ranged from 1 to 106, so I decided to calculate the **arithmetic mean** (average) across all cities of each country instead.
-For this I converted my file to `.json` for easier handling with python, did the necessary calculations in `calculate_perc.py` and updated the file with one column added.
-I also had to rename the column headers, since they included whitespaces and some started with numbers.
-Finally I was able to import and use my small dataset.
----
-### 3. Initial Visualization
-I worked on creating the logic to make the mosaic-visualization with the icons, which is basically a **100% stacked bar graph**. My plan was to show them for each country separately in a modal window onclick.
-Then I went to find geoJSON for creating my map of Europe.
-A main task in the project was to fit the two different datasets together. E.g. the geoJSON dataset would list England, Scotland, Wales and Norther Ireland as separately addressable countries, but my soil sealing data was for the United Kingdom.
-Additionally, there were some different namings and spellings present (e.g. "Walloon" <-> "Belgium", "Cz. Republic" <-> "Czech Republic", etc.).
-In order to be able to combine the data, I had to either write programmatic logic or do data cleaning. As I also took this course as a chance to dive into learning JavaScript, I chose to deal with the issues in JS.
-The **initial visualization** I posted consisted of a plain gray map with orange mouseover events for the countries present in the dataset. And a modal onclick with the tiled mosaic, and a title.
-I gave the visualization out to scrutiny early on purpose, to maybe still take my project into a different direction.---### 4. Feedback and iteration
-However, I worked forward on it and I think by the time I received most of the responses, I already had some additional features implemented.
+# Sealed Cities - Soil Sealing in European Cities
 
-I morphed the map into a chloropleth, accounting for the different degrees of soil sealing, and added tooltip events that display the average % of soil sealed across the cites of one country, when hovering on the country.#### basic mapThe feedback I received was very useful and welcome. I introduced an **info-box** to describe succinctly what soil sealing is. Originally I had a link, but it seems it wasn't obviously findable. All in all I like the solution with the small infobox more.
-I also added a **button** to show the map with all countries colored at the same time. This request came in twice, and it also makes sense. However, there is something about running with the mouse over the countries to get to only slowly and incrementally discover which country has which color and percentage amount, that I really liked. I found it to be very interactive, as it drew me to play around on my graphic repeatedly.
-Therefore I didn't want to do away with this **interactive feature** and decided to add a button instead that would allow to toggle or display the colors.
-Similarly, I decided not to implement the **legend** in the basic map. The chloropleth is a simple mapping of three arbitrarily selected ordinal values (<40%, 40-50%, >50%), that I color-coded in a traffic-light scheme. I have the feeling that this is rather straightforward to understand, and I felt that a legend would draw people away from interacting with the map.
-There is a large extend of **exploration** that I would wish people would do with my visualization. Of course this is only possible within the limited scope that the data allows in the way I present it here.
-However, there is a playful aspect to "chasing countries with the mouse" that I enjoyed myself quite a bit and thus wanted to keep in the final implementation.
-This is also how I decided for the format to transmit the aspect of author-drive storytelliing that I included through adding the button. The button, called "Unseal Soil", displays all the colors of the countries at the same time. At the same time, a sentence pops up declaring that human touch affects the environment, which is the big topic regarding soil sealing.
-When moving the cursor now to one of the countries it displays the same behaviour as before, however when the mouse _leaves_, the country grays out. I woud wish this to be associated with soil sealing happening through human intervention.
-Gradually, all the countries the user touches change to gray and only display their colors, with the added information of the percentage sealed, on mouseover.
-There is the wish to undo the color-loss, but going back does not put the country back into its original status. There is also a different push, the one to mouseover all of the countries once one of them started to gray. I believe both speak in a subtle and emotional way about topics of environmentalism and purity, plus the way many humans are likely to deal with these things. This might not be noticed by many users, but for me it was quite clear and dear.#### modal boxes
-onclick, each country with associated data displays the previously mentioned 100% stacked bar graph as a mosaic of small images.
-The opened modal box gives additional information about the selected country and the associated data:
-- **name** of the country- **how many cities** contributed to the dataset- average soil sealing **visualized** in an icon-mosaic- a **legend** explaining what the icons used stand for
-I hope that this view gives a bit of a better intuitive understanding of _how much_ is a certain percentage value in graspable units.
-#### little secret
-There's another opportunity for mouse-on-map exploring that I left inside:
->**Who can find the country with the lowest average percentage of soil sealing?**
-You can leave a comment if you do. ; )### 5. Shortcomings
-There are three main issues with the final visualization, that are there by choice, but might seem problematic. Definitely they deserve to be mentioned:
-1. The story-mouseover, graying out the countries while displaying their percentages, might be mistaken as a "how many percent of the map did I already seal?", due to its interactive nature.
-2. **Cyprus** is part of the original dataset, however it is not visible on the Europe map that I chose to use.
-3. The data has been pre-processed and I used it like a high-level library. Due to this, the percentage values are averaged twice (one time the average of a range is taken, that a city is counted into - see above in _Data Wrangling_), and then the average over all these data points per country is used to arrive at the final value. There's quite some uncertainty about the validity of these values. First of all because I didn't proof them by referring back to the original dataset, and second because of the two steps of generalization through averaging that I take to come to the value I use.
-One person suggested me to also display the **mean** and **median** value for the countries, to give a better sense of the **distribution**. I think that this is a valid point. I did, however, decide not to do this due to the already vague nature of the data that I am using. It is highly pre-processed and generalized data, therefore I rather leave out these values (that could only be similarly vague as the average) and commit to working with this single value. I am hoping that with this I also open the visualization to scrutiny, instead of giving it a undeserved look of high statistical integrity.
+Soils are extremely valuable, but often not taken care of. Especially in cities, sealing the ground with impervious materials for housing, streets, and car parks, is very common. Soil sealing contributes to global warming, promotes water scarcity and flooding at the same time, and puts biodiversity at peril.
 
-Instead, I took this project as an opportunity to _tell a story_ with the data. And I do still hope that my data is somewhat sound and the story is not overly constructed, but instead within the datasets I used. : )
-## Feedback
+## Summary
+
+This map allows you to explore the average degrees of soil sealing in European cities. It is visible that, in general, the Nothern countries show a lower degree of soil sealing than Central European countries. The average degree of soil sealing across the cities in many European countries is higher than 50%.
+
+
+
+## Design
+
+### 0. Choice of Topic
+
+**Urban sprawl** is a major issue even in the rural areas that I grew up in. Over the years new houses, and the associated shopping districts and parking lots, have been popping up everywhere - but old ones do not get broken down. I didn't have neighbours as a kid, but since then the suburbs have grown all around.
+
+Initially, I was looking for data that would allow me to visualize the large extend of area that has been turned into _living area_ over the past years, however the **CORINE land use data** was difficult to access. I decided that data wrangling was not the main point of this project for me, so I looked for already _digested_ data.
+
+I always wanted to create a map, since I find these visualizations often very attractive and insightful: Projecting information onto projections of the world.
+
+Additionally, maps are one of the functionalities that d3 is especially powerful in, and I wanted to go for the meat of it ; )
+
+---
+
+
+### 1. Choice of Dataset
+
+I sometimes find graphs and charts not completely straightforward to understand, yet I am a all drawn-in by good data visualizations. Inspired also by [this](http://ripetungi.com/wp-content/uploads/Shark-Attack-Stop-Finning-Infographic.png), I wanted to use images to display the ratios of soil sealing.
+
+After searching the site of the [**European Environment Agency**](http://www.eea.europa.eu/data-and-maps/) for a fitting dataset, I found a set dedicated on **soil sealing** in European cities that had pre-processed data from the [CORINE land survey](http://www.eea.europa.eu/data-and-maps/data/corine-land-cover-3#tab-gis-data) easily accessible.
+
+Searching those sites I had also discovered that the soil sealing relative to the countries' surface would be a number of usually below 4%, which would not have been interesting to visualize in the ways that I wanted to explore.
+
+
+So I chose to use the data that went into generating [this graph](http://www.eea.europa.eu/data-and-maps/figures/degree-of-mean-soil-sealing), but give it a different workover.
+
+---
+
+### 2. Data Cleaning and Wrangling
+
+I extracted the data from the `.xlsx` file provided on the website and exported it into `.csv`. After working with the data for a while, I realized that I didn't want to use the `percentage of cities >= 50%`. Some countries had many cities, others very few. It ranged from 1 to 106, so I decided to calculate the **arithmetic mean** (average) across all cities of each country instead.
+Since the cities were not associated with distinct percentage values, but rather fell within one of four ordinal categories, I chose to assign the _average percentage value_ of the range of a category to each city within.
+
+For this I converted my file to `.json` for easier handling with python, did the necessary calculations in `calculate_perc.py` and updated the file with one column added.
+
+I also had to rename the column headers, since they included whitespaces and some started with numbers.
+
+Finally I was able to import and use my small dataset.
+
+---
+
+### 3. Initial Visualization
+
+I worked on creating the logic to make the mosaic-visualization with the icons, which is basically a **100% stacked bar graph**. My plan was to show them for each country separately in a modal window onclick.
+
+Then I went to find geoJSON for creating my map of Europe.
+
+A main task in the project was to fit the two different datasets together. E.g. the geoJSON dataset would list England, Scotland, Wales and Norther Ireland as separately addressable countries, but my soil sealing data was for the United Kingdom.
+
+Additionally, there were some different namings and spellings present (e.g. "Walloon" <-> "Belgium", "Cz. Republic" <-> "Czech Republic", etc.).
+
+In order to be able to combine the data, I had to either write programmatic logic or do data cleaning. As I also took this course as a chance to dive into learning JavaScript, I chose to deal with the issues in JS.
+
+The **initial visualization** I posted consisted of a plain gray map with orange mouseover events for the countries present in the dataset. And a modal onclick with the tiled mosaic, and a title.
+
+
+I gave the visualization out to scrutiny early on purpose, to maybe still take my project into a different direction.
+
+---
+
+### 4. Feedback and iteration
+
+However, I worked forward on it and I think by the time I received most of the responses, I already had some additional features implemented.
+
+I morphed the map into a chloropleth, accounting for the different degrees of soil sealing, and added tooltip events that display the average % of soil sealed across the cites of one country, when hovering on the country.
+
+#### basic map
+
+The feedback I received was very useful and welcome. I introduced an **info-box** to describe succinctly what soil sealing is. Originally I had a link, but it seems it wasn't obviously findable. All in all I like the solution with the small infobox more.
+
+I also added a **button** to show the map with all countries colored at the same time. This request came in twice, and it also makes sense. However, there is something about running with the mouse over the countries to get to only slowly and incrementally discover which country has which color and percentage amount, that I really liked. I found it to be very interactive, as it drew me to play around on my graphic repeatedly.
+
+Therefore I didn't want to do away with this **interactive feature** and decided to add a button instead that would allow to toggle or display the colors.
+
+Similarly, I decided not to implement the **legend** in the basic map. The chloropleth is a simple mapping of three arbitrarily selected ordinal values (<40%, 40-50%, >50%), that I color-coded in a traffic-light scheme. I have the feeling that this is rather straightforward to understand, and I felt that a legend would draw people away from interacting with the map.
+
+There is a large extend of **exploration** that I would wish people would do with my visualization. Of course this is only possible within the limited scope that the data allows in the way I present it here.
+
+However, there is a playful aspect to "chasing countries with the mouse" that I enjoyed myself quite a bit and thus wanted to keep in the final implementation.
+
+This is also how I decided for the format to transmit the aspect of author-driven storytelliing that I included through adding the button. The button, called "Unseal Soil", displays all the colors of the countries together. At the same time, a sentence pops up declaring that human touch affects the environment, which is the big topic regarding soil sealing.
+
+When moving the cursor now to one of the countries it displays the same behaviour as before, however when the mouse _leaves_, the country grays out. I woud wish this to be associated with soil sealing happening through human intervention.
+
+Gradually, all the countries the user touches change to gray. Then they only display their colors, with the added information of the percentage sealed, on mouseover.
+
+There is the wish to undo the color-loss, but going back does not put the country back into its original status. There is also a different push: the one to mouseover all of the countries after one of them has started to gray. I believe both speak in a subtle and emotional way about topics of environmentalism and purity, plus the way many humans are likely to deal with these things. This might not be noticed by many users, but for me it was quite clear and dear.
+
+#### modal boxes
+
+onclick, each country with associated data displays the previously mentioned 100% stacked bar graph as a mosaic of small images.
+
+The opened modal box gives additional information about the selected country and the associated data:
+
+- **name** of the country
+- **how many cities** contributed to the dataset
+- average soil sealing **visualized** in an icon-mosaic
+- a **legend** explaining what the icons used stand for
+
+I hope that this view gives a bit of a better intuitive understanding of _how much_ is a certain percentage value in graspable units.
+
+
+#### little secret
+
+There's another opportunity for mouse-on-map exploring that I left in the final visualization:
+
+>**Who can find the country with the lowest average percentage of soil sealing?**
+
+You can leave a comment if you do. ; )
+
+### 5. Shortcomings
+
+There are three main issues with the final visualization, that are there by choice, but might be problematic. Definitely they deserve to be mentioned:
+
+1. The story-mouseover, resulting in graying out the countries while displaying their percentages, might be mistaken as a "how many percent of the map did I already seal?", due to its interactive nature.
+
+2. **Cyprus** is part of the original dataset, however it is not visible on the Europe map that I chose to use.
+
+3. The data has been pre-processed and I used it like a high-level library. Due to this, the percentage values are averaged twice (one time the _average of a range_ is taken that a city is counted into - see above in _Data Wrangling_), and then the _average over all these data points per country_ is used to arrive at the final value. There's quite some uncertainty about the validity of these values. First of all because I didn't proof them by referring back to the original dataset, and second because of the two steps of generalization through averaging that I take to come to the values I use.
+
+
+One person suggested me to also display the **mean** and **median** value for the countries, to give a better sense of the **distribution**. I think that this is a valid point. I did, however, decide not to do this due to the already vague nature of the data that I am using. It is highly pre-processed and generalized data, therefore I rather leave out these values (that could only be similarly vague as the average) and commit to working with this single value. I am hoping that with this I also open the visualization to scrutiny, instead of giving it a undeserved look of high statistical integrity.
+
+
+Instead, I took this project as an opportunity to _tell a story_ with the data. And I do still hope that my data is somewhat sound and the story is not overly constructed, but instead comes from within the datasets I used. : )
+
+
+## Feedback
 
 ### Udacity Forums
 
@@ -241,7 +324,9 @@ I would say it depends on your goals for what the audience should get out of it.
 : )
 I’ve actually already been working on it forward since I posted here! Mouseover and some styling wasn’t available initially ; )
 
----## Resources
+---
+
+## Resources
 
 ### Data
 
