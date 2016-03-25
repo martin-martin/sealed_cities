@@ -12,9 +12,15 @@
     <body>
       <header>
         <h1>Soil Sealing in European Cities</h1>
-        <p class="top-description">
-          <strong>Click on a country</strong> to see the average amount of soil sealing across its cities.
-        </p>
+        <div class="top-description">
+          <p></p>
+          <p class="description-item">
+            <strong>Mouse-over on a country</strong> to see how many cities have at least half of their soil sealed.
+          </p>
+          <p class="description-item">
+            <strong>Click on a country</strong> to see the average amount of soil sealing across its cities.
+          </p>
+        </div>
       </header>
       <div class="button-container">
         <div class="impact">
@@ -186,11 +192,11 @@ function createGraphic(geo_data, data) {
               (c.country == "Czech Republic" && d.properties.name == "Czech Rep.") ||
               (c.country == "United Kingdom" && uk.indexOf(d.properties.name) != -1)) {
                 // coloring the countries according to a traffic light scheme
-                if (c.total_sealed_in_percent < 40) {
+                if (c.percentage_cities_50_and_above_percent < 40) {
                   color = "lightgreen";
                   return color;
                 }
-                else if (c.total_sealed_in_percent < 50) {
+                else if (c.percentage_cities_50_and_above_percent < 50) {
                   color = "orange";
                   return color;
                 } else {
@@ -250,11 +256,11 @@ function createGraphic(geo_data, data) {
                 (c.country == "United Kingdom"
                   && uk.indexOf(d.properties.name) != -1)) {
                   // coloring the countries according to a traffic light scheme
-                  if (c.total_sealed_in_percent < 40) {
+                  if (c.percentage_cities_50_and_above_percent < 30) {
                     color = "lightgreen";
                     return color;
                   }
-                  else if (c.total_sealed_in_percent < 50) {
+                  else if (c.percentage_cities_50_and_above_percent < 50) {
                     color = "orange";
                     return color;
                   } else {
@@ -301,7 +307,7 @@ function createGraphic(geo_data, data) {
   function populateTooltip(c) {
     // adds the % of soil sealing as text to the tooltip div
     var tip = d3.select(".tooltip");
-    tip.text("".concat(c.total_sealed_in_percent).concat("%").concat("\n")
+    tip.text("".concat(c.percentage_cities_50_and_above_percent).concat("%").concat("\n")
                 .concat("sealed"))
       .style("color", "black");
   // closing populateTooltip()
@@ -383,11 +389,12 @@ function createGraphic(geo_data, data) {
       // refreshing the modal box from the previous call
       country_vis.selectAll('img').remove('img');
       // adding the country name and amount of cities
-      var info_text = "Average soil sealing across ".concat(c.sum_of_cities)
-                                                    .concat(" cities in ")
-                                                    .concat(c.country);
+      var info_text = "Average soil sealing across <strong>".concat(c.sum_of_cities)
+                                                    .concat("</strong> cities in <strong>")
+                                                    .concat(c.country)
+                                                    .concat("</strong>");
       country_info
-          .text(info_text);
+          .html(info_text);
 
       // insert imgs with class 'house'
       var houses = country_vis.selectAll('.house')

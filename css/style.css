@@ -1,4 +1,5 @@
 /* General Page Styles first */
+
 body {
     font-family: 'Oswald', sans-serif;
     text-align: left;
@@ -12,7 +13,14 @@ header {
 }
 
 .top-description {
-    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.description-item {
+    padding: 0;
+    margin: 0;
 }
 
 .info-container {
