@@ -353,6 +353,7 @@ I’ve actually already been working on it forward since I posted here! Mouseove
 - [http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html](http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html)
 - **legend:** [http://zeroviscosity.com/d3-js-step-by-step/step-3-adding-a-legend](http://zeroviscosity.com/d3-js-step-by-step/step-3-adding-a-legend)
 - **flexbox chart:** [http://blog.scottlogic.com/2015/02/02/svg-layout-flexbox.html](http://blog.scottlogic.com/2015/02/02/svg-layout-flexbox.html)
+- **color legend:** [http://d3-legend.susielu.com/#color-examples](http://d3-legend.susielu.com/#color-examples)
 
 ### JavaScript
 
