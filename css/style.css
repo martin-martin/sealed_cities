@@ -30,7 +30,7 @@ header {
     border-radius: 15px;
     padding: 10px;
     position: absolute;
-    top: 145px;
+    top: 220px;
     left: 346px;
 }
 
@@ -41,11 +41,15 @@ strong {
 
 .highlight {
     color: orange;
-    font-weight: lighter;
+}
+
+.introduction {
+    font-size: 10px;
+    color: gray;
+    width: 50%;
 }
 
 a {
-    text-decoration: none;
     color: orange;
 }
 

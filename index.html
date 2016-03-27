@@ -17,13 +17,19 @@
           <!-- blank paragraph provided me the way to move the other two p's down just enough ;) -->
           <p></p>
           <p class="description-item">
-            <strong class="highlight">Mouse-over a country</strong> to see how many cities have at least half of their soil sealed.
+            <strong class="highlight">Scroll over a country</strong> to see how many cities have at least half of their soil sealed.
           </p>
           <p class="description-item">
             <strong class="highlight">Click on a country</strong> to see the average amount of soil sealing across its cities.
           </p>
         </div>
       </header>
+      <div class="introduction">
+          Our soils are extremely valuable, but often not enough taken care of. Especially in cities it is very common to seal the ground with impervious materials for housing, streets, and car parks. <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing"><strong class="highlight">Soil sealing</strong></a> contributes to global warming, promotes water scarcity and flooding at the same time, and puts biodiversity at risk.
+          <hr>
+          European cities show a varying degree of soil sealing.
+          Here you can explore the degrees of soil sealing in Europe's cities, grouped per country.
+        </div>
       <div class="info-box">
         <a href="http://esdac.jrc.ec.europa.eu/themes/soil-sealing">
         <strong class="highlight">SOIL SEALING</strong></a> is the loss of soil resources
@@ -174,15 +180,19 @@ function createGraphic(geo_data, data) {
               (c.country == "United Kingdom"
                 && uk.indexOf(d.properties.name) != -1)) {
                 // coloring the countries according to a traffic light scheme
-                if (c.percentage_cities_50_and_above_percent < 20) {
+                if (c.percentage_cities_50_and_above_percent < 25) {
                   color = "#5DC74C"; // green
                   return color;
                 }
-                else if (c.percentage_cities_50_and_above_percent <= 50) {
+                else if (c.percentage_cities_50_and_above_percent < 50) {
                   color = "orange";
                   return color;
+                }
+                else if (c.percentage_cities_50_and_above_percent < 75) {
+                  color = "#FF3232"; // lightred
+                  return color;
                 } else {
-                  color = "red";
+                  color = "#E50000"; // darkred
                   return color;
                 }
             }
@@ -202,8 +212,9 @@ function createGraphic(geo_data, data) {
   // adding a legend for the color coding of the countries
   // Reference: http://d3-legend.susielu.com/#color-examples
   var ordinal = d3.scale.ordinal()
-    .domain(["< 20%", "20% - 50%", "> 50%"])
-    .range([ "#5DC74C", "orange", "red"]); // #5DC74C is a shade of green
+    .domain(["< 25%", "25% - 49%", "50%  - 74%", "> 75%"])
+    // #5DC74C is a shade of green, #FF3232 light-red, and #E50000 dark-red
+    .range([ "#5DC74C", "orange", "#FF3232", "#E50000"]);
 
   // svg variable declared in line 68, appending a g element here
   svg.append("g")
@@ -219,6 +230,9 @@ function createGraphic(geo_data, data) {
   svg.select(".legendOrdinal")
     .call(legendOrdinal);
   //end of the legend
+
+  svg.append("g")
+    .text("Hellouhellooooehheooe");
 
   function noDataCountry(d) {
       /* returns 'true' when the country on the map is not present
@@ -298,10 +312,13 @@ function createGraphic(geo_data, data) {
     /* adds country name and the % of soil sealing
     as text to the tooltip div */
     var tip = d3.select(".tooltip");
+    var sum_above_50 = c.cat_50_to_74_percent + c.cat_75_and_above_percent;
     tip.html("".concat(c.country)
                 .concat(":<br><b>")
-                .concat(c.percentage_cities_50_and_above_percent)
-                .concat("%")
+                .concat(sum_above_50)
+                .concat("</b> of ")
+                .concat(c.sum_of_cities)
+                .concat(" cities")
                 )
       .style("color", "black");
   };
@@ -336,19 +353,23 @@ function createGraphic(geo_data, data) {
                   && d.properties.name == "Czech Rep.") ||
                 (c.country == "United Kingdom"
                   && uk.indexOf(d.properties.name) != -1)) {
-                  // coloring the countries according to a traffic light scheme
-                  if (c.percentage_cities_50_and_above_percent < 30) {
-                    color = "#5DC74C"; // green
-                    return color;
-                  }
-                  else if (c.percentage_cities_50_and_above_percent < 50) {
-                    color = "orange";
-                    return color;
-                  } else {
-                    color = "red";
-                    return color;
-                  }
-              };
+                // coloring the countries according to a traffic light scheme
+                if (c.percentage_cities_50_and_above_percent < 25) {
+                  color = "#5DC74C"; // green
+                  return color;
+                }
+                else if (c.percentage_cities_50_and_above_percent < 50) {
+                  color = "orange";
+                  return color;
+                }
+                else if (c.percentage_cities_50_and_above_percent < 75) {
+                  color = "#FF3232"; // lightred
+                  return color;
+                } else {
+                  color = "#E50000"; // darkred
+                  return color;
+                }
+            };
             // closing data0.forEach()
             }); return color;
           }
