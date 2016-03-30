@@ -13,24 +13,17 @@ header {
 }
 
 .top-description {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.description-item {
-    padding: 0;
-    margin: 0;
+    padding-left: 10px;
 }
 
 .info-box {
-    font-size: 10px;
+    font-size: 12px;
     color: gray;
     border: 1px solid orange;
     border-radius: 15px;
     padding: 10px;
     position: absolute;
-    top: 220px;
+    top: 240px;
     left: 346px;
 }
 
@@ -44,9 +37,9 @@ strong {
 }
 
 .introduction {
-    font-size: 10px;
+    font-size: 12px;
     color: gray;
-    width: 50%;
+    width: 45%;
 }
 
 a {
