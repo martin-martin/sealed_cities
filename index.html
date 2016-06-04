@@ -44,10 +44,14 @@
 
 // will contain countries with available soil sealing data;for later comparison
 var allCountriesWithData = [];
-/* names of countries constituting the United Kingdom.
-the map lists them as separate countries, the dataset as "United Kingdom"
-so I'll need this array to compare */
-var uk = ["N. Ireland", "England", "Scotland", "Wales"];
+/* names of countries constituting the United Kingdom, Belgium,
+Italy, France, Spain; the map lists them as separate countries,
+the dataset as unified countries so I'll need this array to compare */
+var uk = ["N. Ireland", "England", "Scotland", "Wales", "Faeroe Is."];
+var belgium = ["Walloon", "Flemish"];
+var italy = ["Sicily", "Sardinia"];
+var france = ["Corsica"];
+var spain = ["Balearic Is.", "Canary Is."];
 
 // defining the vars to refer to both loaded datasets
 var geo_data;
@@ -106,6 +110,22 @@ function createGraphic(geo_data, data) {
   uk.forEach(function(p) {
     allCountriesWithData.push(p);
   });
+  // adding the comglomerate that constitutes Belgium
+  belgium.forEach(function(p) {
+    allCountriesWithData.push(p);
+  });
+  // adding the comglomerate that constitutes Italy
+  italy.forEach(function(p) {
+    allCountriesWithData.push(p);
+  });
+  // adding the comglomerate that constitutes France
+  france.forEach(function(p) {
+    allCountriesWithData.push(p);
+  });
+  // adding the comglomerate that constitutes Spain
+  spain.forEach(function(p) {
+    allCountriesWithData.push(p);
+  });
 
   ////
   //// PART 1 - BUILDING THE MAP
@@ -123,7 +143,7 @@ function createGraphic(geo_data, data) {
     .attr('height', height + margin)
     .append('g')
     .attr('class', 'map');
-
+  debugger;
   var projection = d3.geo.mercator()
       // arranging the map so that it fits on the page
       .scale(700)
@@ -148,9 +168,28 @@ function createGraphic(geo_data, data) {
         // unifying the United Kingdom
         if (country_id == "SCT" ||
               country_id == "ENG" ||
+              country_id == "FRO" ||
               country_id == "WLS" ||
               country_id == "NIR") {
           return "UK";
+        // unifying Belgium
+        } else if (country_id == "BFR" ||
+              country_id == "BWR") {
+          return "BEL";
+        // unifying Italy
+        } else if (country_id == "ITX" ||
+              country_id == "ITY" ||
+              country_id == "ITD") {
+          return "IT";
+        // unifying Spain
+        } else if (country_id == "ESX" ||
+              country_id == "ESI" ||
+              country_id == "ESC") {
+          return "ES";
+        // unifying France
+        } else if (country_id == "FXX" ||
+              country_id == "FXC") {
+          return "FRA";
         } else {
           // assign the 'entitiy' class if the country is only one
           return "entity";
@@ -169,8 +208,14 @@ function createGraphic(geo_data, data) {
             if (c.country == d.properties.name ||
               /* accounting for some alternative spelling
               and organization between the two datasets */
-              (c.country == "Belgium" &&
-                d.properties.name == "Walloon") ||
+              (c.country == "Belgium"
+                && belgium.indexOf(d.properties.name) != -1) ||
+              (c.country == "Italy"
+                && italy.indexOf(d.properties.name) != -1) ||
+              (c.country == "Spain"
+                && spain.indexOf(d.properties.name) != -1) ||
+              (c.country == "France"
+                && france.indexOf(d.properties.name) != -1) ||
               (c.country == "The Netherlands" &&
                 d.properties.name == "Netherlands") ||
               (c.country == "Czech Republic" &&
@@ -258,11 +303,25 @@ function createGraphic(geo_data, data) {
     // "seals" the countries on mouseover by highlighting them gray
     var country_id = d.properties.brk_a3;
 
-    /* Using the class "UK" to unify the associated countries and
+    /* Assigning classes to unify the associated countries and
     chaining them in order so that they discolor at the same time */
     var country = d3.selectAll($("#" + country_id));
+    // United Kingdon
     if (country.attr('class') == 'UK') {
       var selected = d3.selectAll('.UK');
+    // Belgium
+    } else if (country.attr('class') == 'BEL') {
+      var selected = d3.selectAll('.BEL');
+    // Italy
+    } else if (country.attr('class') == 'IT') {
+      var selected = d3.selectAll('.IT');
+    // Spain
+    } else if (country.attr('class') == 'ES') {
+      var selected = d3.selectAll('.ES');
+    // France
+    } else if (country.attr('class') == 'FRA') {
+      var selected = d3.selectAll('.FRA');
+    // all the others
     } else {
       var selected = country;
     }
@@ -293,7 +352,16 @@ function createGraphic(geo_data, data) {
         /* accounting for some alternative spelling
         and organization between the files */
         (c.country == "Belgium"
-          && d.properties.name == "Walloon") ||
+          && (d.properties.name == "Walloon" ||
+            d.properties.name == "Flemish")) ||
+        (c.country == "France"
+          && d.properties.name == "Corsica") ||
+        (c.country == "Italy"
+          && (d.properties.name == "Sicily" ||
+            d.properties.name == "Sardinia")) ||
+        (c.country == "Spain"
+          && (d.properties.name == "Balearic Is." ||
+            d.properties.name == "Canary Is.")) ||
         (c.country == "The Netherlands"
           && d.properties.name == "Netherlands") ||
         (c.country == "Czech Republic"
@@ -326,9 +394,17 @@ function createGraphic(geo_data, data) {
     when the cursor leaves the area */
     var country_id = d.properties.brk_a3;
     var country = d3.selectAll($("#" + country_id));
-    // chaining the UK
+    // chaining the different scattered contries
     if (country.attr('class') == 'UK') {
       var selected = d3.selectAll('.UK');
+    } else if (country.attr('class') == 'BEL') {
+      var selected = d3.selectAll('.BEL');
+    } else if (country.attr('class') == 'IT') {
+      var selected = d3.selectAll('.IT');
+    } else if (country.attr('class') == 'ES') {
+      var selected = d3.selectAll('.ES');
+    } else if (country.attr('class') == 'FRA') {
+      var selected = d3.selectAll('.FRA');
     } else {
       var selected = country;
     }
@@ -349,6 +425,14 @@ function createGraphic(geo_data, data) {
                   && d.properties.name == "Netherlands") ||
                 (c.country == "Czech Republic"
                   && d.properties.name == "Czech Rep.") ||
+                (c.country == "Italy"
+                  && italy.indexOf(d.properties.name) != -1) ||
+                (c.country == "Spain"
+                  && spain.indexOf(d.properties.name) != -1) ||
+                (c.country == "France"
+                  && france.indexOf(d.properties.name) != -1) ||
+                (c.country == "Belgium"
+                  && belgium.indexOf(d.properties.name) != -1) ||
                 (c.country == "United Kingdom"
                   && uk.indexOf(d.properties.name) != -1)) {
                 // coloring the countries according to a traffic light scheme
@@ -402,6 +486,14 @@ function createGraphic(geo_data, data) {
           && d.properties.name == "Netherlands") ||
         (c.country == "Czech Republic"
           && d.properties.name == "Czech Rep.") ||
+        (c.country == "Italy"
+          && italy.indexOf(d.properties.name) != -1) ||
+        (c.country == "Spain"
+          && spain.indexOf(d.properties.name) != -1) ||
+        (c.country == "France"
+          && france.indexOf(d.properties.name) != -1) ||
+        (c.country == "Belgium"
+          && belgium.indexOf(d.properties.name) != -1) ||
         (c.country == "United Kingdom"
           && uk.indexOf(d.properties.name) != -1)) {
         return openModal(c);
