@@ -1,5 +1,7 @@
 # Sealed Cities - Soil Sealing in European Cities
 
+[Live Project link](http://martin-martin.github.io/sealed_cities/)
+
 Soils are extremely valuable, but often not taken care of. Especially in cities, sealing the ground with impervious materials for housing, streets, and car parks, is very common. Soil sealing contributes to global warming, promotes water scarcity and flooding at the same time, and puts biodiversity at peril.
 
 ## Summary
