@@ -1,5 +1,7 @@
 # Sealed Cities - Soil Sealing in European Cities
 
+[Live Project link](http://martin-martin.github.io/sealed_cities/)
+
 Soils are extremely valuable, but often not taken care of. Especially in cities, sealing the ground with impervious materials for housing, streets, and car parks, is very common. Soil sealing contributes to global warming, promotes water scarcity and flooding at the same time, and puts biodiversity at peril.
 
 ## Summary
@@ -35,11 +37,11 @@ So I chose to use the data that went into generating [this graph](http://www.eea
 
 ### 2. Choice of Visualization
 
-#### chloropleth
+#### choropleth
 
 Datasets that compare a certain data value across different countries are often most intuitively displayed on a **map**. Being able to locate the different values geo-spatially allows us to anchor the information to reference points in the real world. 
 
-I chose to use a **chloropleth** with a traffic-light scheme to allow a fast overview of the overall structure of cities in the given country. The colors code for the ordinal categories present in the original dataset - that is how many cities have at least 50% of their grounds sealed.
+I chose to use a **choropleth** with a traffic-light scheme to allow a fast overview of the overall structure of cities in the given country. The colors code for the ordinal categories present in the original dataset - that is how many cities have at least 50% of their grounds sealed.
 
 I chose to use two types of red for those countries above 50%, instead of different colors. This is because the dataset and my visualization is laid out to draw the decisive difference between above and below 50%. However, it is still interesting to get an understanding of which countries do have especially high rates of soil sealing in their cities, therefore I included also the darker shade of red for those with very high percentage values.
 
